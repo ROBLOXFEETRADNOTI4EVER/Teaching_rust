@@ -33,23 +33,24 @@ async fn main(spawner: Spawner) {
     let timer0 = TimerGroup::new(peripherals.TIMG1);
     esp_hal_embassy::init(timer0.timer0);
 
-    // Initalazing the framework
-    info!("Embassy initialized!");
+    // Initializing the framework 
+    info!("Embassy initialized!");     // SZB
 
-    // Initalazition of the led
-    let blinky_led: Output<'static> = Output::new(peripherals.GPIO2, esp_hal::gpio::Level::High, OutputConfig::default()); // We are using GPIO2 since it is the builtin led of most Esp32 Devboards
 
-    // In embassy spawner handles the calling of the functions but it is a good practice that all our functions are async supported and non blocking
-    spawner.must_spawn(blinky(blinky_led)); // We call the function here we spawn it 
+    // Initialization of the led
+    let blinky_led: Output<'static> = Output::new(peripherals.GPIO2, esp_hal::gpio::Level::High, OutputConfig::default());// SZB // We are using GPIO2 since it is the builtin led of most Esp32 Devboards
+
+      // SZB  // In embassy spawner handles the calling of the functions but it is a good practice that all our functions are async supported and non blocking
+    spawner.must_spawn(blinky(blinky_led));// SZB // We call the function here we spawn it 
 
 
 
     // for inspiration have a look at the examples at https://github.com/esp-rs/esp-hal/tree/esp-hal-v1.0.0-rc.0/examples/src/bin
 }
-
-#[embassy_executor::task]
+    // SZB the whole function
+#[embassy_executor::task] // It is important to add this flag #[embassy_executor::task]  or else you won't be able to call it in the spawner
 async fn blinky(mut led: Output<'static> ){ // make sure led is mutable  or we won't be able to change its state in the future 
-    // Creating a loop and inside i will blink it every 500 mili secounds.
+    // Creating a loop and inside i will blink it every 500 mili seconds.
     loop {
         Timer::after(Duration::from_millis(500)).await; // We need await here or it will be a bloking timer and we don't want anything to be bloking
         led.toggle(); // We could also do a led.sethigh() delay(500) led.setlow() delay(500) but we can shorten it with just a toggle 
